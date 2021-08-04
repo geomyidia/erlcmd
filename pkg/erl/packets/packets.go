@@ -1,0 +1,100 @@
+package packets
+
+import (
+	"bufio"
+	"encoding/hex"
+	"errors"
+	"fmt"
+	"os"
+
+	erlang "github.com/okeuday/erlang_go/v2/erlang"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/geomyidia/midiserver/pkg/erl"
+)
+
+type Packet struct {
+	bytes []byte
+	len   int
+	last  int
+	opts  *erl.Opts
+}
+
+func ReadStdIOPacket(opts *erl.Opts) (*Packet, error) {
+	reader := bufio.NewReader(os.Stdin)
+	bytes, _ := reader.ReadBytes(erl.DELIMITER)
+	byteLen := len(bytes)
+	if byteLen == 0 {
+		return nil, errors.New("read zero bytes")
+	}
+	log.Tracef("original packet: %#v", bytes)
+	log.Tracef("original packet length: %d", byteLen)
+	packet := &Packet{
+		bytes: bytes,
+		len:   byteLen,
+		last:  byteLen - 1,
+		opts:  opts,
+	}
+	return packet, nil
+}
+
+func (p *Packet) getTrimmed() []byte {
+	log.Debug("getting trimmed ...")
+	return p.bytes[:p.last]
+}
+
+func (p *Packet) Bytes() ([]byte, error) {
+	log.Debug("getting bytes ...")
+	log.Debugf("IsHexEncoded: %v", p.opts.IsHexEncoded)
+	if p.opts.IsHexEncoded {
+		return p.getUnwrapped()
+	}
+	return p.getTrimmed(), nil
+}
+
+// setUnwrapped is a utility method for a hack needed in order to
+// successully handle messages from the Erlang exec library.
+//
+// What was happening when exec messages were being processed
+// by ProcessPortMessage was that a single byte was being dropped
+// from the middle (in the case of the #(command ping) message,
+// it was byte 0x04 of the Term protocol encoded bytes). The
+// bytes at the sending end were present and correct, just not
+// at the receiving end.
+//
+// So, in order to get around this, the sending end hex-encoded
+// the Term protocol bytes and send that as a bitstring; the
+// function below hex-decodes this, and allows the function
+// ProcessExecMessage to handle binary encoded Term data with
+// none of its bytes missing.
+func (p *Packet) getUnwrapped() ([]byte, error) {
+	log.Debug("getting unwrapped ... ")
+	if p.opts.IsHexEncoded {
+		hexStr := string(p.getTrimmed()[:])
+		log.Tracef("got hex string: %s", hexStr)
+		bytes, err := hex.DecodeString(hexStr)
+		log.Tracef("got decoded string: %v", bytes)
+		if err != nil {
+			return nil, fmt.Errorf("problem unwrapping packet: %s", err.Error())
+		}
+		log.Tracef("set trim bytes: %v", bytes)
+		return bytes, nil
+	}
+	return nil, nil
+}
+
+func (p *Packet) Term() (interface{}, error) {
+	log.Debug("getting term ...")
+	bytes, err := p.Bytes()
+	if err != nil {
+		return nil, fmt.Errorf("problem getting bytes %#v: %s",
+			bytes, err.Error())
+	}
+	log.Tracef("got bytes: %v", bytes)
+	term, err := erlang.BinaryToTerm(bytes)
+	if err != nil {
+		return nil, fmt.Errorf("problem creating Erlang term from %#v: %s",
+			bytes, err.Error())
+	}
+	return term, nil
+}
