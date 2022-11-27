@@ -4,7 +4,22 @@ import (
 	"github.com/ergo-services/ergo/etf"
 )
 
-const ResultKey = "result"
+const (
+	ContinueKey = "continue"
+	EmptyKey    = ""
+	OkKey       = "ok"
+	PongKey     = "pong"
+	ResultKey   = "result"
+	StoppingKey = "stopping"
+)
+
+var (
+	ContinueResult = Result(ContinueKey)
+	NoResult       = Result(EmptyKey)
+	OkResult       = Result(OkKey)
+	PongResult     = Result(PongKey)
+	StoppingResult = Result(StoppingKey)
+)
 
 type Result string
 
@@ -30,7 +45,7 @@ func (r ResultMsg) Value() etf.Atom {
 }
 
 func (r ResultMsg) Empty() bool {
-	return string(r.Value()) == ""
+	return string(r.Value()) == string(NoResult)
 }
 
 func (r ResultMsg) ToTerm() etf.Tuple {

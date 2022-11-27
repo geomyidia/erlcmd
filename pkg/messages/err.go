@@ -6,6 +6,8 @@ import (
 
 const ErrKey = "error"
 
+var NoError = Err(EmptyKey)
+
 type Err string
 
 type ErrorMsg struct {
@@ -30,7 +32,7 @@ func (e ErrorMsg) Value() etf.Atom {
 }
 
 func (e ErrorMsg) Empty() bool {
-	return string(e.Value()) == ""
+	return string(e.Value()) == string(NoError)
 }
 
 func (e ErrorMsg) ToTerm() etf.Tuple {
