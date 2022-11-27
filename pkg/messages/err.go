@@ -29,6 +29,10 @@ func (e ErrorMsg) Value() etf.Atom {
 	return e.tuple.Element(2).(etf.Atom)
 }
 
+func (e ErrorMsg) Empty() bool {
+	return string(e.Value()) == ""
+}
+
 func (e ErrorMsg) ToTerm() etf.Tuple {
 	return e.tuple
 }

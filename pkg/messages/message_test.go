@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/ergo-services/ergo/etf"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/geomyidia/erlcmd/pkg/testdata"

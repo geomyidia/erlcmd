@@ -24,3 +24,10 @@ func Decode(data []byte) (interface{}, error) {
 	}
 	return term, nil
 }
+
+func ToDist(data []byte) []byte {
+	data = append(data, byte(0))
+	copy(data[1:], data)
+	data[0] = byte(distHeaderByte)
+	return data
+}
