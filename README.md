@@ -21,7 +21,7 @@ TBD
 
 Apache Version 2 License
 
-Copyright © 2020-2022, Duncan McGreggor
+Copyright © 2021-2022, Duncan McGreggor
 
 [//]: ---Named-Links---
 
