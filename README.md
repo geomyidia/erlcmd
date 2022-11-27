@@ -26,7 +26,7 @@ Copyright © 2021-2022, Duncan McGreggor
 [//]: ---Named-Links---
 
 [logo]: assets/images/logo-v1-x250.png
-[logo-large]: assets/images/logo-v1-x1000.png
+[logo-large]: assets/images/logo-v1-x480.png
 [gh-actions-badge]: https://github.com/geomyidia/erlcmd/workflows/ci%2Fcd/badge.svg
 [gh-actions]: https://github.com/geomyidia/erlcmd/actions
 [go]: https://golang.org/
