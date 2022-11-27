@@ -16,7 +16,6 @@ type Message struct {
 func NewFromBytes(data []byte) (*Message, error) {
 	t, err := constructor.FromBytes(data)
 	if err != nil {
-		log.Error(err)
 		return nil, err
 	}
 	return New(t)
@@ -31,19 +30,22 @@ func New(t interface{}) (*Message, error) {
 	log.Debugf("Got message tuple: %+v", msgTuple)
 	msgType, ok := msgTuple.Element(1).(etf.Atom)
 	if !ok {
-		log.Error(ErrMsgAtomFormat)
-		return nil, ErrMsgAtomFormat
+		err = ErrMsgAtomFormat(msgTuple.Element(1))
+		log.Error(err)
+		return nil, err
 	}
 	log.Debugf("Got message type %v", msgType)
 
 	var args etf.List
-	name, ok := msgTuple.Element(2).(etf.Atom)
-	if ok {
+	payload := msgTuple.Element(2)
+	name, ok := payload.(etf.Atom)
+	switch ok {
+	case true:
 		// This is the case for a simple message with just a name and no args
 		log.Debugf("Got message name %s", name)
-	} else {
+	default:
 		// This is the case for more highly-structured messages
-		name, args, err = messageNameArgs(msgTuple)
+		name, args, err = messageNameArgs(payload)
 		if err != nil {
 			return nil, err
 		}
@@ -100,37 +102,36 @@ func messageTuple(t interface{}) (etf.Tuple, error) {
 	return msgTuple, nil
 }
 
-func messageNameArgs(msgTuple etf.Tuple) (etf.Atom, etf.List, error) {
-	var msgData etf.List
-	var name etf.Atom
-	var ok bool
+func messageNameArgs(payload interface{}) (etf.Atom, etf.List, error) {
 	nilAtom := etf.Atom("")
-	msgVal := msgTuple.Element(2)
-	x, ok := msgVal.(etf.List)
-	if ok {
-		if len(x) == 0 {
-			log.Error(ErrMsgValueFormat)
-			return nilAtom, nil, ErrMsgValueFormat
-		}
-		msgData = x
-	} else {
-		x, ok := msgVal.(etf.Tuple)
-		if !ok {
-			log.Error(ErrMsgValueFormat)
-			return nilAtom, nil, ErrMsgValueFormat
-		}
-		if len(x) == 0 {
-			log.Error(ErrMsgValueFormat)
-			return nilAtom, nil, ErrMsgValueFormat
-		}
-		msgData = etf.List{x}
+	payloadTuple, err := messageTuple(payload)
+	if err != nil {
+		return nilAtom, nil, err
 	}
-	name, ok = msgData[0].(etf.Atom)
+	payloadName := payloadTuple.Element(1)
+	payloadArgs := payloadTuple.Element(2)
+	name, ok := payloadName.(etf.Atom)
 	if !ok {
-		log.Error(ErrMsgNameFormat)
-		return nilAtom, nil, ErrMsgNameFormat
+		err = ErrMsgNameFormat(payloadTuple)
+		log.Error(err)
+		return nilAtom, nil, err
 	}
-	log.Debugf("Got message name %s", name)
-	args := msgData[1:]
+	var args etf.List
+	switch t := payloadArgs.(type) {
+	case etf.List:
+		if len(t) == 0 {
+			err = ErrMsgValueFormat(t)
+			log.Error(err)
+			return nilAtom, nil, err
+		}
+		args = t
+	case etf.Tuple:
+		if len(t) == 0 {
+			err = ErrMsgValueFormat(t)
+			log.Error(err)
+			return nilAtom, nil, err
+		}
+		args = etf.List{t}
+	}
 	return name, args, nil
 }

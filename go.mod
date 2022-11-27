@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/ergo-services/ergo v1.999.220
-	github.com/google/uuid v1.3.0
+	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/okeuday/erlang_go/v2 v2.0.5
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.5.1
