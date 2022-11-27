@@ -10,7 +10,7 @@ import (
 	erlang "github.com/okeuday/erlang_go/v2/erlang"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/geomyidia/erlcmd/pkg/erl"
+	"github.com/geomyidia/erlcmd/pkg/options"
 )
 
 // Constants
@@ -22,7 +22,7 @@ type Packet struct {
 	bytes []byte
 	len   int
 	last  int
-	opts  *erl.Opts
+	opts  *options.Opts
 }
 
 // ReadStdIOPacket reads messages of the Erlang Port format along the
@@ -35,13 +35,13 @@ type Packet struct {
 //   {a, a}      = []byte{0x83, 0x68, 0x2, 0x64, 0x0, 0x1, 0x61, 0x64, 0x0, 0x1, 0x61, 0xa}
 //   {a, test}   = []byte{0x83, 0x68, 0x2, 0x64, 0x0, 0x1, 0x61, 0x64, 0x0, 0x4, 0x74, 0x65, 0x73, 0x74, 0xa}
 //   {a, "test"} = []byte{0x83, 0x68, 0x2, 0x64, 0x0, 0x1, 0x61, 0x6b, 0x0, 0x4, 0x74, 0x65, 0x73, 0x74, 0xa}
-func NewPacketFromStdin(opts *erl.Opts) (*Packet, error) {
+func NewPacketFromStdin(opts *options.Opts) (*Packet, error) {
 	reader := bufio.NewReader(os.Stdin)
 	bytes, _ := reader.ReadBytes(DELIMITER)
 	return NewPacket(bytes, opts)
 }
 
-func NewPacket(bytes []byte, opts *erl.Opts) (*Packet, error) {
+func NewPacket(bytes []byte, opts *options.Opts) (*Packet, error) {
 	bytesLen := len(bytes)
 	if bytesLen == 0 {
 		return nil, errors.New("read zero bytes")
@@ -118,7 +118,7 @@ func (p *Packet) ToTerm() (interface{}, error) {
 	return term, nil
 }
 
-func ToTerm(opts *erl.Opts) (interface{}, error) {
+func ToTerm(opts *options.Opts) (interface{}, error) {
 	packet, err := NewPacketFromStdin(opts)
 	if err != nil {
 		return nil, err

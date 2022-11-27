@@ -3,7 +3,7 @@ package messages
 import (
 	log "github.com/sirupsen/logrus"
 
-	"github.com/geomyidia/erlcmd/pkg/erl/datatypes"
+	"github.com/geomyidia/erlcmd/pkg/datatypes"
 )
 
 type Message struct {

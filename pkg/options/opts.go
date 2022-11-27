@@ -1,4 +1,4 @@
-package erl
+package options
 
 type Opts struct {
 	IsHexEncoded bool

@@ -5,18 +5,18 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/geomyidia/erlcmd/pkg/erl"
-	"github.com/geomyidia/erlcmd/pkg/erl/packets"
-	"github.com/geomyidia/erlcmd/pkg/erl/testdata"
+	"github.com/geomyidia/erlcmd/pkg/options"
+	"github.com/geomyidia/erlcmd/pkg/packets"
+	"github.com/geomyidia/erlcmd/pkg/testdata"
 )
 
 type FromPacketTestSuite struct {
 	suite.Suite
-	opts *erl.Opts
+	opts *options.Opts
 }
 
 func (s *FromPacketTestSuite) SetupSuite() {
-	s.opts = &erl.Opts{IsHexEncoded: true}
+	s.opts = &options.Opts{IsHexEncoded: true}
 }
 
 func (s *FromPacketTestSuite) TestNew() {

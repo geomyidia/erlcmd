@@ -1,7 +1,7 @@
 package messages
 
 import (
-	"github.com/geomyidia/erlcmd/pkg/erl/datatypes"
+	"github.com/geomyidia/erlcmd/pkg/datatypes"
 )
 
 const ResultKey = "result"

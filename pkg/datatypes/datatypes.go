@@ -4,7 +4,7 @@ import (
 	"github.com/okeuday/erlang_go/v2/erlang"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/geomyidia/erlcmd/pkg/erl/packets"
+	"github.com/geomyidia/erlcmd/pkg/packets"
 )
 
 func FromPacket(pkt *packets.Packet) (interface{}, error) {
