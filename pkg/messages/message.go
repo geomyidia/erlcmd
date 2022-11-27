@@ -7,6 +7,10 @@ import (
 	"github.com/geomyidia/erlcmd/pkg/constructor"
 )
 
+const (
+	CommandKey = "command"
+)
+
 type Message struct {
 	messageType etf.Atom
 	name        etf.Atom
@@ -59,7 +63,7 @@ func New(t interface{}) (*Message, error) {
 
 func NewCommandFromName(name string) *Message {
 	return &Message{
-		messageType: etf.Atom("command"),
+		messageType: etf.Atom(CommandKey),
 		name:        etf.Atom(name),
 	}
 }
@@ -103,7 +107,7 @@ func messageTuple(t interface{}) (etf.Tuple, error) {
 }
 
 func messageNameArgs(payload interface{}) (etf.Atom, etf.List, error) {
-	nilAtom := etf.Atom("")
+	nilAtom := etf.Atom(EmptyKey)
 	payloadTuple, err := messageTuple(payload)
 	if err != nil {
 		return nilAtom, nil, err
