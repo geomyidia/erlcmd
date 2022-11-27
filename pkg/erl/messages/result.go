@@ -2,28 +2,29 @@ package messages
 
 import (
 	"github.com/geomyidia/erlcmd/pkg/erl/datatypes"
-	"github.com/geomyidia/erlcmd/pkg/types"
 )
 
 const ResultKey = "result"
 
-type Result struct {
+type Result string
+
+type ReseultMsg struct {
 	tuple *datatypes.Tuple
 }
 
-func NewResult(result types.Result) *Result {
-	return &Result{
+func NewReseultMsg(resultMsg Result) *ReseultMsg {
+	return &ReseultMsg{
 		tuple: datatypes.NewTuple([]interface{}{
 			datatypes.NewAtom(ResultKey),
-			datatypes.NewAtom(string(result)),
+			datatypes.NewAtom(string(resultMsg)),
 		}),
 	}
 }
 
-func (r Result) Value() interface{} {
+func (r ReseultMsg) Value() interface{} {
 	return r.tuple.Value()
 }
 
-func (r Result) ToTerm() (interface{}, error) {
+func (r ReseultMsg) ToTerm() (interface{}, error) {
 	return r.tuple.ToTerm()
 }

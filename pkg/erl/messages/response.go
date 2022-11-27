@@ -5,8 +5,6 @@ import (
 
 	erlang "github.com/okeuday/erlang_go/v2/erlang"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/geomyidia/erlcmd/pkg/types"
 )
 
 type Response struct {
@@ -15,16 +13,16 @@ type Response struct {
 	err      erlang.OtpErlangTuple
 }
 
-func NewResponse(result types.Result, err types.Err) (*Response, error) {
+func NewResponse(result Result, err Err) (*Response, error) {
 	hasError := false
 	if err != "" {
 		hasError = true
 	}
-	r, er := NewResult(result).ToTerm()
+	r, er := NewReseultMsg(result).ToTerm()
 	if er != nil {
 		return nil, er
 	}
-	e, er := NewError(err).ToTerm()
+	e, er := NewErrorMsg(err).ToTerm()
 	if er != nil {
 		return nil, er
 	}
