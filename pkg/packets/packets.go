@@ -3,14 +3,11 @@ package packets
 import (
 	"bufio"
 	"encoding/hex"
-	"errors"
-	"fmt"
 	"os"
 
-	erlang "github.com/okeuday/erlang_go/v2/erlang"
-	log "github.com/sirupsen/logrus"
-
+	"github.com/geomyidia/erlcmd/pkg/decoder"
 	"github.com/geomyidia/erlcmd/pkg/options"
+	log "github.com/sirupsen/logrus"
 )
 
 // Constants
@@ -43,8 +40,14 @@ func NewPacketFromStdin(opts *options.Opts) (*Packet, error) {
 
 func NewPacket(bytes []byte, opts *options.Opts) (*Packet, error) {
 	bytesLen := len(bytes)
-	if bytesLen == 0 {
-		return nil, errors.New("read zero bytes")
+	switch bytesLen {
+	case 0:
+		log.Error(ErrZeroBytes)
+		return nil, ErrZeroBytes
+	case 1:
+		log.Error(ErrOneByte)
+		return nil, ErrOneByte
+	default:
 	}
 	log.Tracef("original packet: %#v", bytes)
 	log.Tracef("original packet length: %d", bytesLen)
@@ -94,7 +97,9 @@ func (p *Packet) getUnwrapped() ([]byte, error) {
 		bytes, err := hex.DecodeString(hexStr)
 		// log.Tracef("got decoded string: %v", bytes)
 		if err != nil {
-			return nil, fmt.Errorf("problem unwrapping packet: %s", err.Error())
+			err = ErrUnwrapPacket(err)
+			log.Error(err)
+			return nil, err
 		}
 		// log.Tracef("set trim bytes: %v", bytes)
 		return bytes, nil
@@ -106,14 +111,16 @@ func (p *Packet) ToTerm() (interface{}, error) {
 	log.Trace("getting term ...")
 	bytes, err := p.Bytes()
 	if err != nil {
-		return nil, fmt.Errorf("problem getting bytes %#v: %s",
-			bytes, err.Error())
+		err = ErrGetBytes(err, bytes)
+		log.Error(err)
+		return nil, err
 	}
 	log.Tracef("got bytes: %v", bytes)
-	term, err := erlang.BinaryToTerm(bytes)
+	term, err := decoder.Decode(bytes)
 	if err != nil {
-		return nil, fmt.Errorf("problem creating Erlang term from %#v: %s",
-			bytes, err.Error())
+		err = ErrCreateTerm(err, bytes)
+		log.Error(err)
+		return nil, err
 	}
 	return term, nil
 }

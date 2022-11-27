@@ -1,30 +1,38 @@
 package messages
 
 import (
-	"github.com/geomyidia/erlcmd/pkg/datatypes"
+	"github.com/ergo-services/ergo/etf"
 )
 
 const ResultKey = "result"
 
 type Result string
 
-type ReseultMsg struct {
-	tuple *datatypes.Tuple
+type ResultMsg struct {
+	tuple etf.Tuple
 }
 
-func NewReseultMsg(resultMsg Result) *ReseultMsg {
-	return &ReseultMsg{
-		tuple: datatypes.NewTuple([]interface{}{
-			datatypes.NewAtom(ResultKey),
-			datatypes.NewAtom(string(resultMsg)),
-		}),
+func NewResultMsg(resultMsg Result) *ResultMsg {
+	return &ResultMsg{
+		tuple: etf.Tuple{
+			etf.Atom(ResultKey),
+			etf.Atom(string(resultMsg)),
+		},
 	}
 }
 
-func (r ReseultMsg) Value() interface{} {
-	return r.tuple.Value()
+func (r ResultMsg) Key() etf.Atom {
+	return r.tuple.Element(1).(etf.Atom)
 }
 
-func (r ReseultMsg) ToTerm() (interface{}, error) {
-	return r.tuple.ToTerm()
+func (r ResultMsg) Value() etf.Atom {
+	return r.tuple.Element(2).(etf.Atom)
+}
+
+func (r ResultMsg) Empty() bool {
+	return string(r.Value()) == ""
+}
+
+func (r ResultMsg) ToTerm() etf.Tuple {
+	return r.tuple
 }

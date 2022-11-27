@@ -3,14 +3,15 @@ package messages
 import (
 	"os"
 
-	erlang "github.com/okeuday/erlang_go/v2/erlang"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/geomyidia/erlcmd/pkg/encoder"
 )
 
 type Response struct {
 	hasError bool
-	result   erlang.OtpErlangTuple
-	err      erlang.OtpErlangTuple
+	result   *ResultMsg
+	err      *ErrorMsg
 }
 
 func NewResponse(result Result, err Err) (*Response, error) {
@@ -18,35 +19,31 @@ func NewResponse(result Result, err Err) (*Response, error) {
 	if err != "" {
 		hasError = true
 	}
-	r, er := NewReseultMsg(result).ToTerm()
-	if er != nil {
-		return nil, er
-	}
-	e, er := NewErrorMsg(err).ToTerm()
-	if er != nil {
-		return nil, er
-	}
 	msg := &Response{
-		result:   r.(erlang.OtpErlangTuple),
-		err:      e.(erlang.OtpErlangTuple),
+		result:   NewResultMsg(result),
+		err:      NewErrorMsg(err),
 		hasError: hasError,
 	}
 	log.Debugf("created result message: %#v", msg)
 	return msg, nil
 }
 
+func (r *Response) HasError() bool {
+	return !r.err.Empty()
+}
+
+func (r *Response) Bytes() ([]byte, error) {
+	return encoder.Encode(r.result.ToTerm())
+}
+
 // SendMessage ...
 func (r *Response) Send() {
-	msg := r.result
 	if r.hasError {
-		msg = r.err
-		log.Errorf("Response: %+v", msg)
+		log.Errorf("Response: %+v", r.err)
 
 	}
-
-	bytes, err := erlang.TermToBinary(msg, -1)
+	bytes, err := r.Bytes()
 	if err != nil {
-		log.Error(err)
 		return
 	}
 	os.Stdout.Write(bytes)
