@@ -3,7 +3,7 @@ package packets
 import (
 	"testing"
 
-	erlang "github.com/okeuday/erlang_go/v2/erlang"
+	"github.com/ergo-services/ergo/etf"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/geomyidia/erlcmd/pkg/options"
@@ -27,8 +27,8 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.Equal(testdata.BatchETFBytes, bytes)
 	term, err := pkt.ToTerm()
 	s.NoError(err)
-	s.Equal("midi", string(term.(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
-	s.Equal("batch", string(term.(erlang.OtpErlangTuple)[1].(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
+	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))
+	s.Equal(etf.Atom("batch"), term.(etf.Tuple).Element(2).(etf.Tuple).Element(1).(etf.Atom))
 
 	pkt, err = NewPacket(testdata.DevicePacketBytes, s.opts)
 	s.NoError(err)
@@ -37,8 +37,8 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.Equal(testdata.DeviceETFBytes, bytes)
 	term, err = pkt.ToTerm()
 	s.NoError(err)
-	s.Equal("midi", string(term.(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
-	s.Equal("batch", string(term.(erlang.OtpErlangTuple)[1].(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
+	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))
+	s.Equal(etf.Atom("batch"), term.(etf.Tuple).Element(2).(etf.Tuple).Element(1).(etf.Atom))
 
 	pkt, err = NewPacket(testdata.NoteOnPacketBytes, s.opts)
 	s.NoError(err)
@@ -47,8 +47,8 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.Equal(testdata.NoteOnETFBytes, bytes)
 	term, err = pkt.ToTerm()
 	s.NoError(err)
-	s.Equal("midi", string(term.(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
-	s.Equal("batch", string(term.(erlang.OtpErlangTuple)[1].(erlang.OtpErlangTuple)[0].(erlang.OtpErlangAtom)))
+	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))
+	s.Equal(etf.Atom("batch"), term.(etf.Tuple).Element(2).(etf.Tuple).Element(1).(etf.Atom))
 }
 
 func TestPacketTestSuite(t *testing.T) {

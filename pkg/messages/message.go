@@ -1,28 +1,20 @@
 package messages
 
 import (
+	"github.com/ergo-services/ergo/etf"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/geomyidia/erlcmd/pkg/datatypes"
+	"github.com/geomyidia/erlcmd/pkg/constructor"
 )
 
 type Message struct {
-	messageType *datatypes.Atom
-	name        *datatypes.Atom
-	args        *datatypes.List
+	messageType etf.Atom
+	name        etf.Atom
+	args        etf.List
 }
 
 func NewFromBytes(data []byte) (*Message, error) {
-	t, err := datatypes.FromBytes(data)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	return New(t)
-}
-
-func NewFromTerm(term interface{}) (*Message, error) {
-	t, err := datatypes.FromTerm(term)
+	t, err := constructor.FromBytes(data)
 	if err != nil {
 		log.Error(err)
 		return nil, err
@@ -37,15 +29,15 @@ func New(t interface{}) (*Message, error) {
 		return nil, err
 	}
 	log.Debugf("Got message tuple: %+v", msgTuple)
-	msgType, ok := msgTuple.Key().(*datatypes.Atom)
+	msgType, ok := msgTuple.Element(1).(etf.Atom)
 	if !ok {
 		log.Error(ErrMsgAtomFormat)
 		return nil, ErrMsgAtomFormat
 	}
 	log.Debugf("Got message type %v", msgType)
 
-	args := datatypes.NewList([]interface{}{})
-	name, ok := msgTuple.Value().(*datatypes.Atom)
+	var args etf.List
+	name, ok := msgTuple.Element(2).(etf.Atom)
 	if ok {
 		// This is the case for a simple message with just a name and no args
 		log.Debugf("Got message name %s", name)
@@ -65,41 +57,41 @@ func New(t interface{}) (*Message, error) {
 
 func NewCommandFromName(name string) *Message {
 	return &Message{
-		messageType: datatypes.NewAtom("command"),
-		name:        datatypes.NewAtom(name),
+		messageType: etf.Atom("command"),
+		name:        etf.Atom(name),
 	}
 }
 
 func (m *Message) Type() string {
-	return m.messageType.Value()
+	return string(m.messageType)
 }
 
 func (m *Message) Name() string {
-	return m.name.Value()
+	return string(m.name)
 }
 
-func (m *Message) Args() []interface{} {
-	return m.args.Elements()
+func (m *Message) Args() etf.List {
+	return m.args
 }
 
 // Private functions
 
-func messageTuple(t interface{}) (*datatypes.Tuple, error) {
-	var msgTuple *datatypes.Tuple
+func messageTuple(t interface{}) (etf.Tuple, error) {
+	var msgTuple etf.Tuple
 	log.Tracef("Got Go/Erlang ports data: %+v", t)
-	parts, ok := t.(*datatypes.List)
+	parts, ok := t.(etf.List)
 	if ok {
-		if parts.Len() > 2 {
+		if len(parts) > 2 {
 			log.Error(ErrMsgListFormat)
 			return nil, ErrMsgListFormat
 		}
-		msgTuple, ok = parts.Nth(0).(*datatypes.Tuple)
+		msgTuple, ok = parts[0].(etf.Tuple)
 		if !ok {
 			log.Error(ErrMsgTupleFormat)
 			return nil, ErrMsgTupleFormat
 		}
 	} else {
-		msgTuple, ok = t.(*datatypes.Tuple)
+		msgTuple, ok = t.(etf.Tuple)
 		if !ok {
 			log.Error(ErrMsgTupleFormat)
 			return nil, ErrMsgTupleFormat
@@ -108,32 +100,37 @@ func messageTuple(t interface{}) (*datatypes.Tuple, error) {
 	return msgTuple, nil
 }
 
-func messageNameArgs(msgTuple *datatypes.Tuple) (*datatypes.Atom, *datatypes.List, error) {
-	var msgData []interface{}
-	var name *datatypes.Atom
+func messageNameArgs(msgTuple etf.Tuple) (etf.Atom, etf.List, error) {
+	var msgData etf.List
+	var name etf.Atom
 	var ok bool
-	msgVal := msgTuple.Value()
-	x, ok := msgVal.(*datatypes.List)
+	nilAtom := etf.Atom("")
+	msgVal := msgTuple.Element(2)
+	x, ok := msgVal.(etf.List)
 	if ok {
-		msgData = x.Elements()
+		if len(x) == 0 {
+			log.Error(ErrMsgValueFormat)
+			return nilAtom, nil, ErrMsgValueFormat
+		}
+		msgData = x
 	} else {
-		x, ok := msgVal.(*datatypes.Tuple)
+		x, ok := msgVal.(etf.Tuple)
 		if !ok {
 			log.Error(ErrMsgValueFormat)
-			return nil, nil, ErrMsgValueFormat
+			return nilAtom, nil, ErrMsgValueFormat
 		}
-		msgData = x.Elements()
+		if len(x) == 0 {
+			log.Error(ErrMsgValueFormat)
+			return nilAtom, nil, ErrMsgValueFormat
+		}
+		msgData = etf.List{x}
 	}
-	if len(msgData) == 0 {
-		log.Error(ErrMsgValueFormat)
-		return nil, nil, ErrMsgValueFormat
-	}
-	name, ok = msgData[0].(*datatypes.Atom)
+	name, ok = msgData[0].(etf.Atom)
 	if !ok {
 		log.Error(ErrMsgNameFormat)
-		return nil, nil, ErrMsgNameFormat
+		return nilAtom, nil, ErrMsgNameFormat
 	}
 	log.Debugf("Got message name %s", name)
-	args := datatypes.NewList(msgData[1:])
+	args := msgData[1:]
 	return name, args, nil
 }

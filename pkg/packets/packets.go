@@ -7,10 +7,9 @@ import (
 	"fmt"
 	"os"
 
-	erlang "github.com/okeuday/erlang_go/v2/erlang"
-	log "github.com/sirupsen/logrus"
-
+	"github.com/geomyidia/erlcmd/pkg/decoder"
 	"github.com/geomyidia/erlcmd/pkg/options"
+	log "github.com/sirupsen/logrus"
 )
 
 // Constants
@@ -110,7 +109,7 @@ func (p *Packet) ToTerm() (interface{}, error) {
 			bytes, err.Error())
 	}
 	log.Tracef("got bytes: %v", bytes)
-	term, err := erlang.BinaryToTerm(bytes)
+	term, err := decoder.Decode(bytes)
 	if err != nil {
 		return nil, fmt.Errorf("problem creating Erlang term from %#v: %s",
 			bytes, err.Error())

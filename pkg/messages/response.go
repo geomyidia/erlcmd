@@ -3,14 +3,15 @@ package messages
 import (
 	"os"
 
-	erlang "github.com/okeuday/erlang_go/v2/erlang"
+	"github.com/ergo-services/ergo/etf"
+	"github.com/okeuday/erlang_go/v2/erlang"
 	log "github.com/sirupsen/logrus"
 )
 
 type Response struct {
 	hasError bool
-	result   erlang.OtpErlangTuple
-	err      erlang.OtpErlangTuple
+	result   etf.Tuple
+	err      etf.Tuple
 }
 
 func NewResponse(result Result, err Err) (*Response, error) {
@@ -18,17 +19,9 @@ func NewResponse(result Result, err Err) (*Response, error) {
 	if err != "" {
 		hasError = true
 	}
-	r, er := NewReseultMsg(result).ToTerm()
-	if er != nil {
-		return nil, er
-	}
-	e, er := NewErrorMsg(err).ToTerm()
-	if er != nil {
-		return nil, er
-	}
 	msg := &Response{
-		result:   r.(erlang.OtpErlangTuple),
-		err:      e.(erlang.OtpErlangTuple),
+		result:   NewResultMsg(result).ToTerm(),
+		err:      NewErrorMsg(err).ToTerm(),
 		hasError: hasError,
 	}
 	log.Debugf("created result message: %#v", msg)
