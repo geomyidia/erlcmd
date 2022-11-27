@@ -1,8 +1,8 @@
 package messages
 
 import (
-	"github.com/ut-proj/midiserver/pkg/erl/datatypes"
-	"github.com/ut-proj/midiserver/pkg/types"
+	"github.com/geomyidia/erlcmd/pkg/erl/datatypes"
+	"github.com/geomyidia/erlcmd/pkg/types"
 )
 
 const ResultKey = "result"

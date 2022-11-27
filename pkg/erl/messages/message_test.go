@@ -7,8 +7,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ut-proj/midiserver/pkg/erl/datatypes"
-	"github.com/ut-proj/midiserver/pkg/erl/testdata"
+	"github.com/geomyidia/erlcmd/pkg/erl/datatypes"
+	"github.com/geomyidia/erlcmd/pkg/erl/testdata"
 )
 
 type MessageTestSuite struct {

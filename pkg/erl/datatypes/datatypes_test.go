@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ut-proj/midiserver/pkg/erl"
-	"github.com/ut-proj/midiserver/pkg/erl/packets"
-	"github.com/ut-proj/midiserver/pkg/erl/testdata"
+	"github.com/geomyidia/erlcmd/pkg/erl"
+	"github.com/geomyidia/erlcmd/pkg/erl/packets"
+	"github.com/geomyidia/erlcmd/pkg/erl/testdata"
 )
 
 type FromPacketTestSuite struct {

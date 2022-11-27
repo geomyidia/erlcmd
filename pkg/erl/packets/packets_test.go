@@ -6,8 +6,8 @@ import (
 	erlang "github.com/okeuday/erlang_go/v2/erlang"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ut-proj/midiserver/pkg/erl"
-	"github.com/ut-proj/midiserver/pkg/erl/testdata"
+	"github.com/geomyidia/erlcmd/pkg/erl"
+	"github.com/geomyidia/erlcmd/pkg/erl/testdata"
 )
 
 type PacketTestSuite struct {
