@@ -17,9 +17,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.17
-    - name: Install deps
-      run: sudo apt-get install libasound2-dev
+        go-version: 1.18
     - name: Get current directory
       run: |
         pwd
