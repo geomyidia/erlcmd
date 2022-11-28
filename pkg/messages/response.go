@@ -14,6 +14,14 @@ type Response struct {
 	err      *ErrorMsg
 }
 
+func NewResultResponse(result Result) (*Response, error) {
+	return NewResponse(result, NoError)
+}
+
+func NewErrorResponse(err Err) (*Response, error) {
+	return NewResponse(NoResult, err)
+}
+
 func NewResponse(result Result, err Err) (*Response, error) {
 	hasError := false
 	if err != "" {
