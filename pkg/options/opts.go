@@ -1,11 +1,17 @@
 package options
 
 type Opts struct {
-	IsHexEncoded bool
+	DecodeHex         bool
+	DropOTPDistHeader bool
+	DropLastByte      bool
+	RequireDistHeader bool
 }
 
 func DefaultOpts() *Opts {
 	return &Opts{
-		IsHexEncoded: false,
+		DecodeHex:         true,
+		DropOTPDistHeader: true,
+		DropLastByte:      false,
+		RequireDistHeader: false,
 	}
 }

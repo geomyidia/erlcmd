@@ -8,18 +8,21 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/geomyidia/erlcmd/pkg/options"
 	"github.com/geomyidia/erlcmd/pkg/testdata"
 )
 
 type MessageTestSuite struct {
 	suite.Suite
+	opts *options.Opts
 }
 
 func (s *MessageTestSuite) SetupSuite() {
+	s.opts = options.DefaultOpts()
 }
 
 func (s *MessageTestSuite) TestNewFromBytesBatch() {
-	msg, err := NewFromBytes(testdata.BatchETFBytes)
+	msg, err := NewFromBytes(testdata.BatchETFBytes, s.opts)
 	s.Require().NoError(err)
 	s.Equal("midi", msg.Type())
 	s.Equal("batch", msg.Name())

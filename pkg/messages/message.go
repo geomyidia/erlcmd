@@ -5,6 +5,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/geomyidia/erlcmd/pkg/constructor"
+	"github.com/geomyidia/erlcmd/pkg/options"
 )
 
 const (
@@ -15,17 +16,18 @@ type Message struct {
 	messageType etf.Atom
 	name        etf.Atom
 	args        etf.List
+	opts        *options.Opts
 }
 
-func NewFromBytes(data []byte) (*Message, error) {
-	t, err := constructor.FromBytes(data)
+func NewFromBytes(data []byte, opts *options.Opts) (*Message, error) {
+	t, err := constructor.FromBytes(data, opts)
 	if err != nil {
 		return nil, err
 	}
-	return New(t)
+	return New(t, opts)
 }
 
-func New(t interface{}) (*Message, error) {
+func New(t interface{}, opts *options.Opts) (*Message, error) {
 	var ok bool
 	msgTuple, err := messageTuple(t)
 	if err != nil {
@@ -58,13 +60,15 @@ func New(t interface{}) (*Message, error) {
 		messageType: msgType,
 		name:        name,
 		args:        args,
+		opts:        opts,
 	}, nil
 }
 
-func NewCommandFromName(name string) *Message {
+func NewCommandFromName(name string, opts *options.Opts) *Message {
 	return &Message{
 		messageType: etf.Atom(CommandKey),
 		name:        etf.Atom(name),
+		opts:        opts,
 	}
 }
 
@@ -78,6 +82,10 @@ func (m *Message) Name() string {
 
 func (m *Message) Args() etf.List {
 	return m.args
+}
+
+func (m *Message) Options() *options.Opts {
+	return m.opts
 }
 
 // Private functions
