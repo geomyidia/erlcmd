@@ -21,7 +21,7 @@ func (s *ResponseTestSuite) TestBytes() {
 	s.Require().NoError(err)
 	bytes, err := r.Bytes()
 	s.Require().NoError(err)
-	parsed, err := decoder.Decode(decoder.ToDist(bytes))
+	parsed, err := decoder.Decode(bytes)
 	s.Require().NoError(err)
 	s.Equal(etf.Tuple{etf.Atom("result"), etf.Atom("ok")}, parsed)
 }
