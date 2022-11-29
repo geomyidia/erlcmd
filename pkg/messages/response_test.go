@@ -7,23 +7,27 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/geomyidia/erlcmd/pkg/decoder"
+	"github.com/geomyidia/erlcmd/pkg/options"
 )
 
 type ResponseTestSuite struct {
 	suite.Suite
+	opts *options.Opts
 }
 
 func (s *ResponseTestSuite) SetupSuite() {
+	s.opts = options.DefaultOpts()
 }
 
 func (s *ResponseTestSuite) TestBytes() {
-	r, err := NewResponse(Result("ok"), Err(""))
+	r, err := NewResponse(OkResult, NoError)
 	s.Require().NoError(err)
 	bytes, err := r.Bytes()
 	s.Require().NoError(err)
-	parsed, err := decoder.Decode(bytes)
+	parsed, err := decoder.Decode(bytes, s.opts)
 	s.Require().NoError(err)
-	s.Equal(etf.Tuple{etf.Atom("result"), etf.Atom("ok")}, parsed)
+	expected := etf.Tuple{etf.Atom("result"), etf.Atom("ok")}
+	s.Equal(expected, parsed)
 }
 
 func TestResponseTestSuite(t *testing.T) {

@@ -8,6 +8,7 @@ import (
 
 	"github.com/geomyidia/erlcmd/pkg/options"
 	"github.com/geomyidia/erlcmd/pkg/testdata"
+	"github.com/geomyidia/erlcmd/pkg/util"
 )
 
 type PacketTestSuite struct {
@@ -16,7 +17,7 @@ type PacketTestSuite struct {
 }
 
 func (s *PacketTestSuite) SetupSuite() {
-	s.opts = &options.Opts{IsHexEncoded: true}
+	s.opts = options.DefaultOpts()
 }
 
 func (s *PacketTestSuite) TestNewPacketBatchs() {
@@ -24,7 +25,10 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.NoError(err)
 	bytes, err := pkt.Bytes()
 	s.NoError(err)
-	s.Equal(testdata.BatchETFBytes, bytes)
+	s.NotNil(bytes)
+	s.True(len(bytes) > 0)
+	s.NotEqual(bytes, []byte(nil))
+	s.Equal(util.DropOTPDistHeader(testdata.BatchETFBytes), bytes)
 	term, err := pkt.ToTerm()
 	s.NoError(err)
 	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))
@@ -34,7 +38,7 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.NoError(err)
 	bytes, err = pkt.Bytes()
 	s.NoError(err)
-	s.Equal(testdata.DeviceETFBytes, bytes)
+	s.Equal(util.DropOTPDistHeader(testdata.DeviceETFBytes), bytes)
 	term, err = pkt.ToTerm()
 	s.NoError(err)
 	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))
@@ -44,7 +48,7 @@ func (s *PacketTestSuite) TestNewPacketBatchs() {
 	s.NoError(err)
 	bytes, err = pkt.Bytes()
 	s.NoError(err)
-	s.Equal(testdata.NoteOnETFBytes, bytes)
+	s.Equal(util.DropOTPDistHeader(testdata.NoteOnETFBytes), bytes)
 	term, err = pkt.ToTerm()
 	s.NoError(err)
 	s.Equal(etf.Atom("midi"), term.(etf.Tuple).Element(1).(etf.Atom))

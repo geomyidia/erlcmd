@@ -17,7 +17,7 @@ type FromPacketTestSuite struct {
 }
 
 func (s *FromPacketTestSuite) SetupSuite() {
-	s.opts = &options.Opts{IsHexEncoded: true}
+	s.opts = options.DefaultOpts()
 }
 
 func (s *FromPacketTestSuite) TestNew() {
